@@ -17,53 +17,57 @@ interface BibleData {
 }
 
 export default function BibleInterface() {
+  const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState<"chinese" | "english" | "both">(
-    () =>
-      (localStorage.getItem("language") as "chinese" | "english" | "both") ||
-      "chinese"
+    "chinese"
   );
-  const [currentBook, setCurrentBook] = useState<BibleBook | null>(() => {
-    const savedBook = localStorage.getItem("currentBook");
-    return savedBook ? JSON.parse(savedBook) : null;
-  });
+  const [currentBook, setCurrentBook] = useState<BibleBook | null>(null);
   const [bibleData, setBibleData] = useState<BibleData | null>(null);
-  const [currentChapter, setCurrentChapter] = useState(() => {
-    return parseInt(localStorage.getItem("currentChapter") || "1", 10);
-  });
+  const [currentChapter, setCurrentChapter] = useState(1);
   const chaptersPerGroup = 15;
   const [bibleContent, setBibleContent] = useState<string[][]>([]);
   const [isBookListOpen, setIsBookListOpen] = useState(false);
   const [chapterCount, setChapterCount] = useState(0);
 
   useEffect(() => {
-    async function fetchBookList() {
+    setIsClient(true);
+    const storedLanguage = localStorage.getItem("language") as
+      | "chinese"
+      | "english"
+      | "both";
+    const storedBook = localStorage.getItem("currentBook");
+    const storedChapter = localStorage.getItem("currentChapter");
+
+    if (storedLanguage) setLanguage(storedLanguage);
+    if (storedBook) setCurrentBook(JSON.parse(storedBook));
+    if (storedChapter) setCurrentChapter(parseInt(storedChapter, 10));
+  }, []);
+
+  useEffect(() => {
+    async function fetchBibleData() {
       try {
         const response = await fetch("/api/book-list");
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error("Failed to fetch Bible book list");
         }
-        const data: BibleData = await response.json();
+        const data = await response.json();
+        console.log("Bible Book List:", data);
         setBibleData(data);
-        if (!currentBook) {
-          const savedBook = localStorage.getItem("currentBook");
-          if (savedBook) {
-            setCurrentBook(JSON.parse(savedBook));
-          } else {
-            setCurrentBook(data.cuv[0]);
-          }
+        if (!currentBook && data.cuv.length > 0) {
+          setCurrentBook(data.cuv[0]);
         }
       } catch (error) {
-        console.error("Failed to fetch book list:", error);
-        // You might want to set an error state here to display to the user
+        console.error("Error fetching Bible book list:", error);
       }
     }
-    fetchBookList();
+    fetchBibleData();
   }, []);
 
   useEffect(() => {
     async function fetchBibleContent() {
       if (currentBook) {
         try {
+          console.log("Fetching content for book:", currentBook);
           const cuvResponse = await fetch(
             `/api/bible?version=cuv&bookId=${currentBook.id}`
           );
@@ -78,40 +82,22 @@ export default function BibleInterface() {
           const cuvData = await cuvResponse.json();
           const esvData = await esvResponse.json();
 
+          console.log("CUV Data:", cuvData);
+          console.log("ESV Data:", esvData);
+
           setBibleContent([
             cuvData.chapters[currentChapter - 1],
             esvData.chapters[currentChapter - 1],
           ]);
+          setChapterCount(cuvData.chapters.length);
           window.scrollTo(0, 0);
         } catch (error) {
           console.error("Error fetching Bible content:", error);
-          // Handle the error appropriately, maybe set an error state
         }
       }
     }
     fetchBibleContent();
   }, [currentBook, currentChapter]);
-
-  useEffect(() => {
-    async function fetchChapterCount() {
-      if (currentBook) {
-        try {
-          const response = await fetch(
-            `/api/bible?version=cuv&bookId=${currentBook.id}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch chapter count");
-          }
-          const data = await response.json();
-          setChapterCount(data.chapters.length);
-        } catch (error) {
-          console.error("Error fetching chapter count:", error);
-          // Handle the error appropriately
-        }
-      }
-    }
-    fetchChapterCount();
-  }, [currentBook]);
 
   useEffect(() => {
     if (currentBook) {
@@ -128,6 +114,10 @@ export default function BibleInterface() {
   useEffect(() => {
     localStorage.setItem("language", language);
   }, [language]);
+
+  if (!isClient) {
+    return null; // or a loading indicator
+  }
 
   const getBookName = (book: BibleBook | null) => {
     if (!book || !bibleData) return "";

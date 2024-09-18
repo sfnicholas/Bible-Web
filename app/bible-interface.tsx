@@ -61,6 +61,7 @@ export default function BibleInterface() {
       }
     }
     fetchBibleData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

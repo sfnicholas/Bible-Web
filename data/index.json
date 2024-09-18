@@ -1,0 +1,666 @@
+{
+  "cuv": [
+    {
+      "id": "gn",
+      "name": "創世記",
+      "abv": "創"
+    },
+    {
+      "id": "ex",
+      "name": "出埃及記",
+      "abv": "出"
+    },
+    {
+      "id": "lv",
+      "name": "利未記",
+      "abv": "利"
+    },
+    {
+      "id": "nm",
+      "name": "民數記",
+      "abv": "民"
+    },
+    {
+      "id": "dt",
+      "name": "申命記",
+      "abv": "申"
+    },
+    {
+      "id": "js",
+      "name": "約書亞記",
+      "abv": "書"
+    },
+    {
+      "id": "jud",
+      "name": "士師記",
+      "abv": "士"
+    },
+    {
+      "id": "rt",
+      "name": "路得記",
+      "abv": "得"
+    },
+    {
+      "id": "1sm",
+      "name": "撒母耳記上",
+      "abv": "撒上"
+    },
+    {
+      "id": "2sm",
+      "name": "撒母耳記下",
+      "abv": "撒下"
+    },
+    {
+      "id": "1kgs",
+      "name": "列王紀上",
+      "abv": "王上"
+    },
+    {
+      "id": "2kgs",
+      "name": "列王紀下",
+      "abv": "王下"
+    },
+    {
+      "id": "1ch",
+      "name": "歷代志上",
+      "abv": "代上"
+    },
+    {
+      "id": "2ch",
+      "name": "歷代志下",
+      "abv": "代下"
+    },
+    {
+      "id": "ezr",
+      "name": "以斯拉記",
+      "abv": "拉"
+    },
+    {
+      "id": "ne",
+      "name": "尼希米記",
+      "abv": "尼"
+    },
+    {
+      "id": "et",
+      "name": "以斯帖記",
+      "abv": "斯"
+    },
+    {
+      "id": "job",
+      "name": "約伯記",
+      "abv": "伯"
+    },
+    {
+      "id": "ps",
+      "name": "詩篇",
+      "abv": "詩"
+    },
+    {
+      "id": "prv",
+      "name": "箴言",
+      "abv": "箴"
+    },
+    {
+      "id": "ec",
+      "name": "傳道書",
+      "abv": "傳"
+    },
+    {
+      "id": "so",
+      "name": "雅歌",
+      "abv": "歌"
+    },
+    {
+      "id": "is",
+      "name": "以賽亞書",
+      "abv": "賽"
+    },
+    {
+      "id": "jr",
+      "name": "耶利米書",
+      "abv": "耶"
+    },
+    {
+      "id": "lm",
+      "name": "耶利米哀歌",
+      "abv": "哀"
+    },
+    {
+      "id": "ez",
+      "name": "以西結書",
+      "abv": "結"
+    },
+    {
+      "id": "dn",
+      "name": "但以理書",
+      "abv": "但"
+    },
+    {
+      "id": "ho",
+      "name": "何西阿書",
+      "abv": "何"
+    },
+    {
+      "id": "jl",
+      "name": "約珥書",
+      "abv": "珥"
+    },
+    {
+      "id": "am",
+      "name": "阿摩司書",
+      "abv": "摩"
+    },
+    {
+      "id": "ob",
+      "name": "俄巴底亞書",
+      "abv": "俄"
+    },
+    {
+      "id": "jn",
+      "name": "約拿書",
+      "abv": "拿"
+    },
+    {
+      "id": "mi",
+      "name": "彌迦書",
+      "abv": "彌"
+    },
+    {
+      "id": "na",
+      "name": "那鴻書",
+      "abv": "鴻"
+    },
+    {
+      "id": "hk",
+      "name": "哈巴谷書",
+      "abv": "哈"
+    },
+    {
+      "id": "zp",
+      "name": "西番雅書",
+      "abv": "番"
+    },
+    {
+      "id": "hg",
+      "name": "哈該書",
+      "abv": "該"
+    },
+    {
+      "id": "zc",
+      "name": "撒迦利亞書",
+      "abv": "亞"
+    },
+    {
+      "id": "ml",
+      "name": "瑪拉基書",
+      "abv": "瑪"
+    },
+    {
+      "id": "mt",
+      "name": "馬太福音",
+      "abv": "太"
+    },
+    {
+      "id": "mk",
+      "name": "馬可福音",
+      "abv": "可"
+    },
+    {
+      "id": "lk",
+      "name": "路加福音",
+      "abv": "路"
+    },
+    {
+      "id": "jo",
+      "name": "約翰福音",
+      "abv": "約"
+    },
+    {
+      "id": "act",
+      "name": "使徒行傳",
+      "abv": "徒"
+    },
+    {
+      "id": "rm",
+      "name": "羅馬書",
+      "abv": "羅"
+    },
+    {
+      "id": "1co",
+      "name": "哥林多前書",
+      "abv": "林前"
+    },
+    {
+      "id": "2co",
+      "name": "哥林多後書",
+      "abv": "林後"
+    },
+    {
+      "id": "gl",
+      "name": "加拉太書",
+      "abv": "加"
+    },
+    {
+      "id": "eph",
+      "name": "以弗所書",
+      "abv": "弗"
+    },
+    {
+      "id": "ph",
+      "name": "腓立比書",
+      "abv": "腓"
+    },
+    {
+      "id": "cl",
+      "name": "歌羅西書",
+      "abv": "西"
+    },
+    {
+      "id": "1ts",
+      "name": "帖撒羅尼迦前書",
+      "abv": "帖前"
+    },
+    {
+      "id": "2ts",
+      "name": "帖撒羅尼迦後書",
+      "abv": "帖後"
+    },
+    {
+      "id": "1tm",
+      "name": "提摩太前書",
+      "abv": "提前"
+    },
+    {
+      "id": "2tm",
+      "name": "提摩太後書",
+      "abv": "提後"
+    },
+    {
+      "id": "tt",
+      "name": "提多書",
+      "abv": "多"
+    },
+    {
+      "id": "phm",
+      "name": "腓利門書",
+      "abv": "門"
+    },
+    {
+      "id": "hb",
+      "name": "希伯來書",
+      "abv": "來"
+    },
+    {
+      "id": "jm",
+      "name": "雅各書",
+      "abv": "雅"
+    },
+    {
+      "id": "1pe",
+      "name": "彼得前書",
+      "abv": "彼前"
+    },
+    {
+      "id": "2pe",
+      "name": "彼得後書",
+      "abv": "彼後"
+    },
+    {
+      "id": "1jo",
+      "name": "約翰一書",
+      "abv": "約一"
+    },
+    {
+      "id": "2jo",
+      "name": "約翰二書",
+      "abv": "約二"
+    },
+    {
+      "id": "3jo",
+      "name": "約翰三書",
+      "abv": "約三"
+    },
+    {
+      "id": "jd",
+      "name": "猶大書",
+      "abv": "猶"
+    },
+    {
+      "id": "re",
+      "name": "啟示錄",
+      "abv": "啟"
+    }
+  ],
+  "esv": [
+    {
+      "id": "gn",
+      "name": "Genesis",
+      "abv": "Gen"
+    },
+    {
+      "id": "ex",
+      "name": "Exodus",
+      "abv": "Exod"
+    },
+    {
+      "id": "lv",
+      "name": "Leviticus",
+      "abv": "Lev"
+    },
+    {
+      "id": "nm",
+      "name": "Numbers",
+      "abv": "Num"
+    },
+    {
+      "id": "dt",
+      "name": "Deuteronomy",
+      "abv": "Deut"
+    },
+    {
+      "id": "js",
+      "name": "Joshua",
+      "abv": "Josh"
+    },
+    {
+      "id": "jud",
+      "name": "Judges",
+      "abv": "Judg"
+    },
+    {
+      "id": "rt",
+      "name": "Ruth",
+      "abv": "Ruth"
+    },
+    {
+      "id": "1sm",
+      "name": "1 Samuel",
+      "abv": "1 Sam"
+    },
+    {
+      "id": "2sm",
+      "name": "2 Samuel",
+      "abv": "2 Sam"
+    },
+    {
+      "id": "1kgs",
+      "name": "1 Kings",
+      "abv": "1 Kgs"
+    },
+    {
+      "id": "2kgs",
+      "name": "2 Kings",
+      "abv": "2 Kgs"
+    },
+    {
+      "id": "1ch",
+      "name": "1 Chronicles",
+      "abv": "1 Chr"
+    },
+    {
+      "id": "2ch",
+      "name": "2 Chronicles",
+      "abv": "2 Chr"
+    },
+    {
+      "id": "ezr",
+      "name": "Ezra",
+      "abv": "Ezra"
+    },
+    {
+      "id": "ne",
+      "name": "Nehemiah",
+      "abv": "Neh"
+    },
+    {
+      "id": "et",
+      "name": "Esther",
+      "abv": "Esth"
+    },
+    {
+      "id": "job",
+      "name": "Job",
+      "abv": "Job"
+    },
+    {
+      "id": "ps",
+      "name": "Psalms",
+      "abv": "Ps"
+    },
+    {
+      "id": "prv",
+      "name": "Proverbs",
+      "abv": "Prov"
+    },
+    {
+      "id": "ec",
+      "name": "Ecclesiastes",
+      "abv": "Eccl"
+    },
+    {
+      "id": "so",
+      "name": "Song of Solomon",
+      "abv": "Song"
+    },
+    {
+      "id": "is",
+      "name": "Isaiah",
+      "abv": "Isa"
+    },
+    {
+      "id": "jr",
+      "name": "Jeremiah",
+      "abv": "Jer"
+    },
+    {
+      "id": "lm",
+      "name": "Lamentations",
+      "abv": "Lam"
+    },
+    {
+      "id": "ez",
+      "name": "Ezekiel",
+      "abv": "Ezek"
+    },
+    {
+      "id": "dn",
+      "name": "Daniel",
+      "abv": "Dan"
+    },
+    {
+      "id": "ho",
+      "name": "Hosea",
+      "abv": "Hos"
+    },
+    {
+      "id": "jl",
+      "name": "Joel",
+      "abv": "Joel"
+    },
+    {
+      "id": "am",
+      "name": "Amos",
+      "abv": "Amos"
+    },
+    {
+      "id": "ob",
+      "name": "Obadiah",
+      "abv": "Obad"
+    },
+    {
+      "id": "jn",
+      "name": "Jonah",
+      "abv": "Jonah"
+    },
+    {
+      "id": "mi",
+      "name": "Micah",
+      "abv": "Mic"
+    },
+    {
+      "id": "na",
+      "name": "Nahum",
+      "abv": "Nah"
+    },
+    {
+      "id": "hk",
+      "name": "Habakkuk",
+      "abv": "Hab"
+    },
+    {
+      "id": "zp",
+      "name": "Zephaniah",
+      "abv": "Zeph"
+    },
+    {
+      "id": "hg",
+      "name": "Haggai",
+      "abv": "Hag"
+    },
+    {
+      "id": "zc",
+      "name": "Zechariah",
+      "abv": "Zech"
+    },
+    {
+      "id": "ml",
+      "name": "Malachi",
+      "abv": "Mal"
+    },
+    {
+      "id": "mt",
+      "name": "Matthew",
+      "abv": "Matt"
+    },
+    {
+      "id": "mk",
+      "name": "Mark",
+      "abv": "Mark"
+    },
+    {
+      "id": "lk",
+      "name": "Luke",
+      "abv": "Luke"
+    },
+    {
+      "id": "jo",
+      "name": "John",
+      "abv": "John"
+    },
+    {
+      "id": "act",
+      "name": "Acts",
+      "abv": "Acts"
+    },
+    {
+      "id": "rm",
+      "name": "Romans",
+      "abv": "Rom"
+    },
+    {
+      "id": "1co",
+      "name": "1 Corinthians",
+      "abv": "1 Cor"
+    },
+    {
+      "id": "2co",
+      "name": "2 Corinthians",
+      "abv": "2 Cor"
+    },
+    {
+      "id": "gl",
+      "name": "Galatians",
+      "abv": "Gal"
+    },
+    {
+      "id": "eph",
+      "name": "Ephesians",
+      "abv": "Eph"
+    },
+    {
+      "id": "ph",
+      "name": "Philippians",
+      "abv": "Phil"
+    },
+    {
+      "id": "cl",
+      "name": "Colossians",
+      "abv": "Col"
+    },
+    {
+      "id": "1ts",
+      "name": "1 Thessalonians",
+      "abv": "1 Thess"
+    },
+    {
+      "id": "2ts",
+      "name": "2 Thessalonians",
+      "abv": "2 Thess"
+    },
+    {
+      "id": "1tm",
+      "name": "1 Timothy",
+      "abv": "1 Tim"
+    },
+    {
+      "id": "2tm",
+      "name": "2 Timothy",
+      "abv": "2 Tim"
+    },
+    {
+      "id": "tt",
+      "name": "Titus",
+      "abv": "Titus"
+    },
+    {
+      "id": "phm",
+      "name": "Philemon",
+      "abv": "Phlm"
+    },
+    {
+      "id": "hb",
+      "name": "Hebrews",
+      "abv": "Heb"
+    },
+    {
+      "id": "jm",
+      "name": "James",
+      "abv": "Jas"
+    },
+    {
+      "id": "1pe",
+      "name": "1 Peter",
+      "abv": "1 Pet"
+    },
+    {
+      "id": "2pe",
+      "name": "2 Peter",
+      "abv": "2 Pet"
+    },
+    {
+      "id": "1jo",
+      "name": "1 John",
+      "abv": "1 John"
+    },
+    {
+      "id": "2jo",
+      "name": "2 John",
+      "abv": "2 John"
+    },
+    {
+      "id": "3jo",
+      "name": "3 John",
+      "abv": "3 John"
+    },
+    {
+      "id": "jd",
+      "name": "Jude",
+      "abv": "Jude"
+    },
+    {
+      "id": "re",
+      "name": "Revelation",
+      "abv": "Rev"
+    }
+  ]
+}

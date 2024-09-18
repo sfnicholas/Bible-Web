@@ -1,170 +1,294 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet";
-import { Globe, Menu } from "lucide-react";
+import { Globe, Book } from "lucide-react";
 
-const bibleBooks = [
-  { abbr: "創", name: "創世記", english: "Genesis" },
-  { abbr: "出", name: "出埃及記", english: "Exodus" },
-  { abbr: "利", name: "利未記", english: "Leviticus" },
-  { abbr: "民", name: "民數記", english: "Numbers" },
-  { abbr: "申", name: "申命記", english: "Deuteronomy" },
-  // ... (other books remain unchanged)
-  { abbr: "瑪", name: "瑪拉基書", english: "Malachi" },
-];
+interface BibleBook {
+  id: string;
+  name: string;
+  abv: string;
+}
+
+interface BibleData {
+  cuv: BibleBook[];
+  esv: BibleBook[];
+}
 
 export default function BibleInterface() {
   const [language, setLanguage] = useState<"chinese" | "english" | "both">(
     "chinese"
   );
-  const [currentBook, setCurrentBook] = useState(bibleBooks[0].name);
+  const [currentBook, setCurrentBook] = useState<BibleBook | null>(null);
+  const [bibleData, setBibleData] = useState<BibleData | null>(null);
+  const [currentChapter, setCurrentChapter] = useState(1);
+  const chaptersPerGroup = 15;
+  const [bibleContent, setBibleContent] = useState<string[][]>([]);
+  const [isBookListOpen, setIsBookListOpen] = useState(false);
+  const [chapterCount, setChapterCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    async function fetchBookList() {
+      try {
+        const response = await fetch("/api/book-list");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: BibleData = await response.json();
+        setBibleData(data);
+        setCurrentBook(data.cuv[0]); // Set the first book as default
+      } catch (error) {
+        console.error("Failed to fetch book list:", error);
+        // Handle the error appropriately, maybe set an error state
+      }
+    }
+    fetchBookList();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBibleContent() {
+      if (currentBook) {
+        const cuvResponse = await fetch(
+          `/api/bible?version=cuv&bookId=${currentBook.id}`
+        );
+        const esvResponse = await fetch(
+          `/api/bible?version=esv&bookId=${currentBook.id}`
+        );
+        const cuvData = await cuvResponse.json();
+        const esvData = await esvResponse.json();
+        setBibleContent([
+          cuvData.chapters[currentChapter - 1],
+          esvData.chapters[currentChapter - 1],
+        ]);
+      }
+    }
+    fetchBibleContent();
+  }, [currentBook, currentChapter]);
+
+  useEffect(() => {
+    async function fetchChapterCount() {
+      if (currentBook) {
+        const response = await fetch(
+          `/api/bible?version=cuv&bookId=${currentBook.id}`
+        );
+        const data = await response.json();
+        setChapterCount(data.chapters.length);
+      }
+    }
+    fetchChapterCount();
+  }, [currentBook]);
+
+  useEffect(() => {
+    if (currentBook) {
+      setCurrentChapter(1);
+      setCurrentPage(1);
+    }
+  }, [currentBook]);
+
+  const getBookName = (book: BibleBook | null) => {
+    if (!book || !bibleData) return "";
+    return language === "english"
+      ? bibleData.esv.find((b) => b.id === book.id)?.name || book.name
+      : book.name;
+  };
+
+  const getBookAbv = (book: BibleBook | null) => {
+    if (!book || !bibleData) return "";
+    return language === "english"
+      ? bibleData.esv.find((b) => b.id === book.id)?.abv || book.abv
+      : book.abv;
+  };
+
+  const getChapterButtons = () => {
+    if (!currentBook) return null;
+
+    const buttons = [];
+    const totalChapters = chapterCount;
+    const currentGroup = Math.ceil(currentChapter / chaptersPerGroup);
+    const totalGroups = Math.ceil(totalChapters / chaptersPerGroup);
+
+    // Add book name
+    buttons.push(
+      <Button
+        key="book-name"
+        variant="link"
+        className="font-bold text-blue-800 mr-2"
+      >
+        {getBookName(currentBook)}
+      </Button>
+    );
+
+    buttons.push(
+      <span key="separator-start" className="text-gray-400 mx-1">
+        |
+      </span>
+    );
+
+    // Add grouped buttons
+    for (let i = 1; i <= totalGroups; i++) {
+      const start = (i - 1) * chaptersPerGroup + 1;
+      const end = Math.min(i * chaptersPerGroup, totalChapters);
+
+      if (i === currentGroup) {
+        // Show individual buttons for the current group
+        for (let j = start; j <= end; j++) {
+          buttons.push(
+            <Button
+              key={j}
+              variant={j === currentChapter ? "secondary" : "ghost"}
+              onClick={() => setCurrentChapter(j)}
+              className="text-blue-800 px-2 py-1 mx-0.5"
+            >
+              {j}
+            </Button>
+          );
+        }
+      } else {
+        // Show grouped button for other groups
+        buttons.push(
+          <Button
+            key={`group-${i}`}
+            variant="link"
+            onClick={() => setCurrentChapter(start)}
+            className="text-blue-800 px-2 py-1 mx-0.5"
+          >
+            {start}-{end}
+          </Button>
+        );
+      }
+
+      if (i < totalGroups) {
+        buttons.push(
+          <span key={`separator-${i}`} className="text-gray-400 mx-1">
+            |
+          </span>
+        );
+      }
+    }
+
+    return (
+      <div className="bg-gray-100 p-2 flex justify-center items-center flex-wrap">
+        {buttons}
+      </div>
+    );
+  };
 
   const getContent = () => {
+    if (!bibleContent[0] || !bibleContent[1] || !currentBook || !bibleData)
+      return null;
+
+    const [cuvContent, esvContent] = bibleContent;
+    const esvBook = bibleData.esv.find((b) => b.id === currentBook.id);
+
     switch (language) {
       case "chinese":
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4">第一章</h2>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">1</span>起初　神創造天地。
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">2</span>
-              地是空虛混沌．淵面黑暗．　神的靈運行在水面上。
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">3</span>
-              　神說、要有光、就有了光。
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">4</span>
-              　神看光是好的、就把光暗分開了。
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">5</span>
-              　神稱光為晝、稱暗為夜．有晚上、有早晨、這是頭一日。
-            </p>
+            <h2 className="text-2xl font-bold mb-4 text-black">
+              {currentBook.name} 第{currentChapter}章
+            </h2>
+            {cuvContent.map((verse, index) => (
+              <p key={index} className="mb-1">
+                <span className="text-red-600 mr-2">{index + 1}</span>
+                {verse}
+              </p>
+            ))}
           </>
         );
       case "english":
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4">Chapter 1</h2>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">1</span>In the beginning, God
-              created the heavens and the earth.
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">2</span>The earth was without
-              form and void, and darkness was over the face of the deep. And the
-              Spirit of God was hovering over the face of the waters.
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">3</span>And God said,
-              &quot;Let there be light,&quot; and there was light.
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">4</span>And God saw that the
-              light was good. And God separated the light from the darkness.
-            </p>
-            <p className="mb-1">
-              <span className="text-red-500 mr-2">5</span>God called the light
-              Day, and the darkness he called Night. And there was evening and
-              there was morning, the first day.
-            </p>
+            <h2 className="text-2xl font-bold mb-4 text-black">
+              {esvBook?.name || currentBook.name} Chapter {currentChapter}
+            </h2>
+            {esvContent.map((verse, index) => (
+              <p key={index} className="mb-1">
+                <span className="text-red-600 mr-2">{index + 1}</span>
+                {verse}
+              </p>
+            ))}
           </>
         );
       case "both":
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4">第一章 / Chapter 1</h2>
-            <div className="mb-2">
-              <p className="mb-0">
-                <span className="text-red-500 mr-2">1</span>起初　神創造天地。
-              </p>
-              <p className="ml-6 mb-0 text-gray-600">
-                In the beginning, God created the heavens and the earth.
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="mb-0">
-                <span className="text-red-500 mr-2">2</span>
-                地是空虛混沌．淵面黑暗．　神的靈運行在水面上。
-              </p>
-              <p className="ml-6 mb-0 text-gray-600">
-                The earth was without form and void, and darkness was over the
-                face of the deep. And the Spirit of God was hovering over the
-                face of the waters.
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="mb-0">
-                <span className="text-red-500 mr-2">3</span>
-                　神說、要有光、就有了光。
-              </p>
-              <p className="ml-6 mb-0 text-gray-600">
-                And God said, &quot;Let there be light,&quot; and there was
-                light.
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="mb-0">
-                <span className="text-red-500 mr-2">4</span>
-                　神看光是好的、就把光暗分開了。
-              </p>
-              <p className="ml-6 mb-0 text-gray-600">
-                And God saw that the light was good. And God separated the light
-                from the darkness.
-              </p>
-            </div>
-            <div className="mb-2">
-              <p className="mb-0">
-                <span className="text-red-500 mr-2">5</span>
-                　神稱光為晝、稱暗為夜．有晚上、有早晨、這是頭一日。
-              </p>
-              <p className="ml-6 mb-0 text-gray-600">
-                God called the light Day, and the darkness he called Night. And
-                there was evening and there was morning, the first day.
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold mb-4 text-black">
+              {currentBook.name} 第{currentChapter}章 /{" "}
+              {esvBook?.name || currentBook.name} Chapter {currentChapter}
+            </h2>
+            {cuvContent.map((verse, index) => (
+              <div key={index} className="mb-2">
+                <p className="mb-0">
+                  <span className="text-red-600 mr-2">{index + 1}</span>
+                  {verse}
+                </p>
+                <p className="ml-6 mb-0 text-gray-600">{esvContent[index]}</p>
+              </div>
+            ))}
           </>
         );
     }
   };
 
+  const getBookList = () => {
+    if (!bibleData) return null;
+
+    const oldTestament = bibleData.cuv.slice(0, 39);
+    const newTestament = bibleData.cuv.slice(39);
+
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <h3 className="font-bold mb-2">舊約 / Old Testament</h3>
+          {oldTestament.map((book) => (
+            <Button
+              key={book.id}
+              variant="ghost"
+              className="justify-start hover:bg-purple-100 hover:text-purple-700"
+              onClick={() => {
+                setCurrentBook(book);
+                setIsBookListOpen(false);
+              }}
+            >
+              <span>{getBookName(book)}</span>
+            </Button>
+          ))}
+        </div>
+        <div>
+          <h3 className="font-bold mb-2">新約 / New Testament</h3>
+          {newTestament.map((book) => (
+            <Button
+              key={book.id}
+              variant="ghost"
+              className="justify-start hover:bg-purple-100 hover:text-purple-700"
+              onClick={() => {
+                setCurrentBook(book);
+                setIsBookListOpen(false);
+              }}
+            >
+              <span>{getBookName(book)}</span>
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <header className="bg-purple-600 text-white p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <Sheet>
+          <Sheet open={isBookListOpen} onOpenChange={setIsBookListOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-purple-700"
-              >
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
+              <Button variant="ghost" className="hover:bg-purple-700">
+                <Book className="mr-2 h-4 w-4" />
+                聖經目錄 / Bible Book List
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
-              <nav className="grid gap-4">
-                {bibleBooks.map((book) => (
-                  <Button
-                    key={book.abbr}
-                    variant="ghost"
-                    className="justify-start hover:bg-purple-100 hover:text-purple-700"
-                    onClick={() => setCurrentBook(book.name)}
-                  >
-                    <span className="w-8">{book.abbr}</span>
-                    <span>
-                      {language === "english" ? book.english : book.name}
-                    </span>
-                  </Button>
-                ))}
-              </nav>
+            <SheetContent side="left" className="w-[400px] sm:w-[540px]">
+              {getBookList()}
             </SheetContent>
           </Sheet>
           <Button variant="secondary" className="ml-2 hover:bg-purple-700">
@@ -202,12 +326,8 @@ export default function BibleInterface() {
           </div>
         </div>
       </header>
-      <main className="container mx-auto mt-8 p-4 bg-white rounded-lg shadow">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          {language === "english"
-            ? bibleBooks.find((book) => book.name === currentBook)?.english
-            : currentBook}
-        </h1>
+      {getChapterButtons()}
+      <main className="container mx-auto mt-4 p-4 bg-gray-100 rounded-lg shadow flex-grow">
         <div className="prose max-w-none">{getContent()}</div>
       </main>
     </div>

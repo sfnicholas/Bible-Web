@@ -27,12 +27,11 @@ export default function BibleInterface() {
   const [bibleContent, setBibleContent] = useState<string[][]>([]);
   const [isBookListOpen, setIsBookListOpen] = useState(false);
   const [chapterCount, setChapterCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     async function fetchBookList() {
       try {
-        const response = await fetch("/api/book-list");
+        const response = await fetch("/api/booklist");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -41,7 +40,7 @@ export default function BibleInterface() {
         setCurrentBook(data.cuv[0]); // Set the first book as default
       } catch (error) {
         console.error("Failed to fetch book list:", error);
-        // Handle the error appropriately, maybe set an error state
+        // You might want to set an error state here to display to the user
       }
     }
     fetchBookList();
@@ -50,18 +49,29 @@ export default function BibleInterface() {
   useEffect(() => {
     async function fetchBibleContent() {
       if (currentBook) {
-        const cuvResponse = await fetch(
-          `/api/bible?version=cuv&bookId=${currentBook.id}`
-        );
-        const esvResponse = await fetch(
-          `/api/bible?version=esv&bookId=${currentBook.id}`
-        );
-        const cuvData = await cuvResponse.json();
-        const esvData = await esvResponse.json();
-        setBibleContent([
-          cuvData.chapters[currentChapter - 1],
-          esvData.chapters[currentChapter - 1],
-        ]);
+        try {
+          const cuvResponse = await fetch(
+            `/api/bible?version=cuv&bookId=${currentBook.id}`
+          );
+          const esvResponse = await fetch(
+            `/api/bible?version=esv&bookId=${currentBook.id}`
+          );
+
+          if (!cuvResponse.ok || !esvResponse.ok) {
+            throw new Error("Failed to fetch Bible content");
+          }
+
+          const cuvData = await cuvResponse.json();
+          const esvData = await esvResponse.json();
+
+          setBibleContent([
+            cuvData.chapters[currentChapter - 1],
+            esvData.chapters[currentChapter - 1],
+          ]);
+        } catch (error) {
+          console.error("Error fetching Bible content:", error);
+          // Handle the error appropriately, maybe set an error state
+        }
       }
     }
     fetchBibleContent();
@@ -70,11 +80,19 @@ export default function BibleInterface() {
   useEffect(() => {
     async function fetchChapterCount() {
       if (currentBook) {
-        const response = await fetch(
-          `/api/bible?version=cuv&bookId=${currentBook.id}`
-        );
-        const data = await response.json();
-        setChapterCount(data.chapters.length);
+        try {
+          const response = await fetch(
+            `/api/bible?version=cuv&bookId=${currentBook.id}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch chapter count");
+          }
+          const data = await response.json();
+          setChapterCount(data.chapters.length);
+        } catch (error) {
+          console.error("Error fetching chapter count:", error);
+          // Handle the error appropriately
+        }
       }
     }
     fetchChapterCount();
@@ -83,7 +101,6 @@ export default function BibleInterface() {
   useEffect(() => {
     if (currentBook) {
       setCurrentChapter(1);
-      setCurrentPage(1);
     }
   }, [currentBook]);
 

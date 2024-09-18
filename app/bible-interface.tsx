@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet";
 import { Globe, Book } from "lucide-react";
@@ -18,11 +18,18 @@ interface BibleData {
 
 export default function BibleInterface() {
   const [language, setLanguage] = useState<"chinese" | "english" | "both">(
-    "chinese"
+    () =>
+      (localStorage.getItem("language") as "chinese" | "english" | "both") ||
+      "chinese"
   );
-  const [currentBook, setCurrentBook] = useState<BibleBook | null>(null);
+  const [currentBook, setCurrentBook] = useState<BibleBook | null>(() => {
+    const savedBook = localStorage.getItem("currentBook");
+    return savedBook ? JSON.parse(savedBook) : null;
+  });
   const [bibleData, setBibleData] = useState<BibleData | null>(null);
-  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentChapter, setCurrentChapter] = useState(() => {
+    return parseInt(localStorage.getItem("currentChapter") || "1", 10);
+  });
   const chaptersPerGroup = 15;
   const [bibleContent, setBibleContent] = useState<string[][]>([]);
   const [isBookListOpen, setIsBookListOpen] = useState(false);
@@ -31,13 +38,20 @@ export default function BibleInterface() {
   useEffect(() => {
     async function fetchBookList() {
       try {
-        const response = await fetch("/api/booklist");
+        const response = await fetch("/api/book-list");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: BibleData = await response.json();
         setBibleData(data);
-        setCurrentBook(data.cuv[0]); // Set the first book as default
+        if (!currentBook) {
+          const savedBook = localStorage.getItem("currentBook");
+          if (savedBook) {
+            setCurrentBook(JSON.parse(savedBook));
+          } else {
+            setCurrentBook(data.cuv[0]);
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch book list:", error);
         // You might want to set an error state here to display to the user
@@ -68,6 +82,7 @@ export default function BibleInterface() {
             cuvData.chapters[currentChapter - 1],
             esvData.chapters[currentChapter - 1],
           ]);
+          window.scrollTo(0, 0);
         } catch (error) {
           console.error("Error fetching Bible content:", error);
           // Handle the error appropriately, maybe set an error state
@@ -100,22 +115,30 @@ export default function BibleInterface() {
 
   useEffect(() => {
     if (currentBook) {
+      localStorage.setItem("currentBook", JSON.stringify(currentBook));
       setCurrentChapter(1);
+      localStorage.setItem("currentChapter", "1");
     }
   }, [currentBook]);
 
+  useEffect(() => {
+    localStorage.setItem("currentChapter", currentChapter.toString());
+  }, [currentChapter]);
+
+  useEffect(() => {
+    localStorage.setItem("language", language);
+  }, [language]);
+
   const getBookName = (book: BibleBook | null) => {
     if (!book || !bibleData) return "";
-    return language === "english"
-      ? bibleData.esv.find((b) => b.id === book.id)?.name || book.name
-      : book.name;
+    const esvBook = bibleData.esv.find((b) => b.id === book.id);
+    return language === "english" ? esvBook?.name || book.name : book.name;
   };
 
   const getBookAbv = (book: BibleBook | null) => {
     if (!book || !bibleData) return "";
-    return language === "english"
-      ? bibleData.esv.find((b) => b.id === book.id)?.abv || book.abv
-      : book.abv;
+    const esvBook = bibleData.esv.find((b) => b.id === book.id);
+    return language === "english" ? esvBook?.abv || book.abv : book.abv;
   };
 
   const getChapterButtons = () => {
@@ -197,28 +220,41 @@ export default function BibleInterface() {
       return null;
 
     const [cuvContent, esvContent] = bibleContent;
-    const esvBook = bibleData.esv.find((b) => b.id === currentBook.id);
+
+    const processChineseVerse = (verse: string, index: number) => {
+      if (verse.length === 1 && verse.toLowerCase() === "a") {
+        return (
+          <p key={index} className="mb-1 text-gray-400 italic">
+            <span className="text-red-600 mr-2">{index + 1}</span>
+            [跳過]
+          </p>
+        );
+      }
+      return (
+        <p key={index} className="mb-1">
+          <span className="text-red-600 mr-2">{index + 1}</span>
+          {verse}
+        </p>
+      );
+    };
 
     switch (language) {
       case "chinese":
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              {currentBook.name} 第{currentChapter}章
+            <h2 className="text-2xl mb-4 text-black">
+              {getBookName(currentBook)} 第{currentChapter}章
             </h2>
-            {cuvContent.map((verse, index) => (
-              <p key={index} className="mb-1">
-                <span className="text-red-600 mr-2">{index + 1}</span>
-                {verse}
-              </p>
-            ))}
+            {cuvContent.map((verse, index) =>
+              processChineseVerse(verse, index)
+            )}
           </>
         );
       case "english":
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              {esvBook?.name || currentBook.name} Chapter {currentChapter}
+            <h2 className="text-2xl mb-4 text-black">
+              {getBookName(currentBook)} Chapter {currentChapter}
             </h2>
             {esvContent.map((verse, index) => (
               <p key={index} className="mb-1">
@@ -229,19 +265,25 @@ export default function BibleInterface() {
           </>
         );
       case "both":
+        const chineseName = currentBook.name;
+        const englishName =
+          bibleData.esv.find((b) => b.id === currentBook.id)?.name ||
+          currentBook.name;
         return (
           <>
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              {currentBook.name} 第{currentChapter}章 /{" "}
-              {esvBook?.name || currentBook.name} Chapter {currentChapter}
+            <h2 className="text-2xl mb-4 text-black">
+              {chineseName} 第{currentChapter}章 / {englishName} Chapter{" "}
+              {currentChapter}
             </h2>
             {cuvContent.map((verse, index) => (
-              <div key={index} className="mb-2">
-                <p className="mb-0">
-                  <span className="text-red-600 mr-2">{index + 1}</span>
-                  {verse}
+              <div key={index} className="mb-1.5">
+                {processChineseVerse(verse, index)}
+                <p className="mb-2 text-gray-600">
+                  <span className="text-red-600 invisible mr-2">
+                    {index + 1}
+                  </span>
+                  {esvContent[index]}
                 </p>
-                <p className="ml-6 mb-0 text-gray-600">{esvContent[index]}</p>
               </div>
             ))}
           </>
@@ -259,35 +301,39 @@ export default function BibleInterface() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h3 className="font-bold mb-2">舊約 / Old Testament</h3>
-          {oldTestament.map((book) => (
-            <Button
-              key={book.id}
-              variant="ghost"
-              className="justify-start hover:bg-purple-100 hover:text-purple-700"
-              onClick={() => {
-                setCurrentBook(book);
-                setIsBookListOpen(false);
-              }}
-            >
-              <span>{getBookName(book)}</span>
-            </Button>
-          ))}
+          <div className="grid grid-cols-5 gap-2">
+            {oldTestament.map((book) => (
+              <Button
+                key={book.id}
+                variant="ghost"
+                className="p-1 h-auto text-xs hover:bg-purple-100 hover:text-purple-700"
+                onClick={() => {
+                  setCurrentBook(book);
+                  setIsBookListOpen(false);
+                }}
+              >
+                {getBookAbv(book)}
+              </Button>
+            ))}
+          </div>
         </div>
         <div>
           <h3 className="font-bold mb-2">新約 / New Testament</h3>
-          {newTestament.map((book) => (
-            <Button
-              key={book.id}
-              variant="ghost"
-              className="justify-start hover:bg-purple-100 hover:text-purple-700"
-              onClick={() => {
-                setCurrentBook(book);
-                setIsBookListOpen(false);
-              }}
-            >
-              <span>{getBookName(book)}</span>
-            </Button>
-          ))}
+          <div className="grid grid-cols-5 gap-2">
+            {newTestament.map((book) => (
+              <Button
+                key={book.id}
+                variant="ghost"
+                className="p-1 h-auto text-xs hover:bg-purple-100 hover:text-purple-700"
+                onClick={() => {
+                  setCurrentBook(book);
+                  setIsBookListOpen(false);
+                }}
+              >
+                {getBookAbv(book)}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -304,16 +350,13 @@ export default function BibleInterface() {
                 聖經目錄 / Bible Book List
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[400px] sm:w-[540px]">
+            <SheetContent
+              side="left"
+              className="w-[80vw] sm:w-[60vw] max-w-[800px]"
+            >
               {getBookList()}
             </SheetContent>
           </Sheet>
-          <Button variant="secondary" className="ml-2 hover:bg-purple-700">
-            舊約全書
-          </Button>
-          <Button variant="secondary" className="ml-2 hover:bg-purple-700">
-            新約全書
-          </Button>
         </div>
         <div className="flex items-center">
           <div className="flex space-x-2">

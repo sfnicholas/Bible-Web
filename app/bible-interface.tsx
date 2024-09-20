@@ -267,7 +267,7 @@ export default function BibleInterface() {
               {currentChapter}
             </h2>
             {cuvContent.map((verse, index) => (
-              <div key={index} className="mb-1.5">
+              <div key={index} className="mb-1.5 text-black">
                 {processChineseVerse(verse, index)}
                 <p className="mb-2 text-gray-600">
                   <span className="text-red-600 invisible mr-2">

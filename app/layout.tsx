@@ -15,19 +15,28 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Bible Web App",
   description: "A bilingual Bible web application providing both cuv and esv",
-  icons: {
-    icon: "/BibleLogo.jpg",
-  },
+  icons: [
+    { rel: "icon", url: "/BibleLogo.jpg" },
+    { rel: "apple-touch-icon", url: "/BibleLogo.jpg" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <head>
+        <meta name="color-scheme" content="light" />
+        <link rel="icon" href="/BibleLogo.jpg" />
+        <link rel="apple-touch-icon" href="/BibleLogo.jpg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <main className="flex-grow">{children}</main>
+      </body>
     </html>
   );
 }

@@ -19,11 +19,17 @@ interface BibleData {
 export default function BibleInterface() {
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState<"chinese" | "english" | "both">(
-    "chinese"
+    () =>
+      (localStorage.getItem("language") as "chinese" | "english" | "both") ||
+      "chinese"
   );
-  const [currentBook, setCurrentBook] = useState<BibleBook | null>(null);
+  const [currentBook, setCurrentBook] = useState<BibleBook | null>(() =>
+    JSON.parse(localStorage.getItem("currentBook") || "null")
+  );
   const [bibleData, setBibleData] = useState<BibleData | null>(null);
-  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentChapter, setCurrentChapter] = useState(() =>
+    parseInt(localStorage.getItem("currentChapter") || "1", 10)
+  );
   const chaptersPerGroup = 15;
   const [bibleContent, setBibleContent] = useState<string[][]>([]);
   const [isBookListOpen, setIsBookListOpen] = useState(false);
@@ -103,8 +109,6 @@ export default function BibleInterface() {
   useEffect(() => {
     if (currentBook) {
       localStorage.setItem("currentBook", JSON.stringify(currentBook));
-      setCurrentChapter(1);
-      localStorage.setItem("currentChapter", "1");
     }
   }, [currentBook]);
 

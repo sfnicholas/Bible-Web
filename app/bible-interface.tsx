@@ -16,38 +16,28 @@ interface BibleData {
   esv: BibleBook[];
 }
 
-export default function BibleInterface() {
-  const [isClient, setIsClient] = useState(false);
-  const [language, setLanguage] = useState<"chinese" | "english" | "both">(
-    () =>
-      (localStorage.getItem("language") as "chinese" | "english" | "both") ||
-      "chinese"
+export default function ClientBibleInterface() {
+  const [language, setLanguage] = useState<"chinese" | "english" | "both">(() =>
+    typeof window !== "undefined"
+      ? (localStorage.getItem("language") as "chinese" | "english" | "both") ||
+        "chinese"
+      : "chinese"
   );
   const [currentBook, setCurrentBook] = useState<BibleBook | null>(() =>
-    JSON.parse(localStorage.getItem("currentBook") || "null")
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("currentBook") || "null")
+      : null
   );
   const [bibleData, setBibleData] = useState<BibleData | null>(null);
   const [currentChapter, setCurrentChapter] = useState(() =>
-    parseInt(localStorage.getItem("currentChapter") || "1", 10)
+    typeof window !== "undefined"
+      ? parseInt(localStorage.getItem("currentChapter") || "1", 10)
+      : 1
   );
   const chaptersPerGroup = 15;
   const [bibleContent, setBibleContent] = useState<string[][]>([]);
   const [isBookListOpen, setIsBookListOpen] = useState(false);
   const [chapterCount, setChapterCount] = useState(0);
-
-  useEffect(() => {
-    setIsClient(true);
-    const storedLanguage = localStorage.getItem("language") as
-      | "chinese"
-      | "english"
-      | "both";
-    const storedBook = localStorage.getItem("currentBook");
-    const storedChapter = localStorage.getItem("currentChapter");
-
-    if (storedLanguage) setLanguage(storedLanguage);
-    if (storedBook) setCurrentBook(JSON.parse(storedBook));
-    if (storedChapter) setCurrentChapter(parseInt(storedChapter, 10));
-  }, []);
 
   useEffect(() => {
     async function fetchBibleData() {
@@ -120,9 +110,10 @@ export default function BibleInterface() {
     localStorage.setItem("language", language);
   }, [language]);
 
-  if (!isClient) {
-    return null; // or a loading indicator
-  }
+  const changeBook = (book: BibleBook) => {
+    setCurrentBook(book);
+    setCurrentChapter(1);
+  };
 
   const getBookName = (book: BibleBook | null) => {
     if (!book || !bibleData) return "";
@@ -303,7 +294,7 @@ export default function BibleInterface() {
                 variant="ghost"
                 className="p-1 h-auto text-xs hover:bg-purple-100 hover:text-purple-700"
                 onClick={() => {
-                  setCurrentBook(book);
+                  changeBook(book);
                   setIsBookListOpen(false);
                 }}
               >
@@ -321,7 +312,7 @@ export default function BibleInterface() {
                 variant="ghost"
                 className="p-1 h-auto text-xs hover:bg-purple-100 hover:text-purple-700"
                 onClick={() => {
-                  setCurrentBook(book);
+                  changeBook(book);
                   setIsBookListOpen(false);
                 }}
               >

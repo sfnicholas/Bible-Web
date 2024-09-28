@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet";
 import { Globe, Book } from "lucide-react";
@@ -109,6 +109,81 @@ export default function ClientBibleInterface() {
   useEffect(() => {
     localStorage.setItem("language", language);
   }, [language]);
+
+  const goToPreviousChapter = useCallback(() => {
+    if (!currentBook || !bibleData) return;
+    const currentBookIndex = bibleData.cuv.findIndex(
+      (book) => book.id === currentBook.id
+    );
+    if (currentChapter > 1) {
+      setCurrentChapter(currentChapter - 1);
+    } else if (currentBookIndex > 0) {
+      const previousBook = bibleData.cuv[currentBookIndex - 1];
+      setCurrentBook(previousBook);
+      // Fetch the chapter count for the previous book
+      fetch(`/api/bible?version=cuv&bookId=${previousBook.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setChapterCount(data.chapters.length);
+          setCurrentChapter(data.chapters.length);
+        })
+        .catch((error) =>
+          console.error("Error fetching previous book data:", error)
+        );
+    }
+  }, [currentBook, bibleData, currentChapter]);
+
+  const goToNextChapter = useCallback(() => {
+    if (!currentBook || !bibleData) return;
+    const currentBookIndex = bibleData.cuv.findIndex(
+      (book) => book.id === currentBook.id
+    );
+    if (currentChapter < chapterCount) {
+      setCurrentChapter(currentChapter + 1);
+    } else if (currentBookIndex < bibleData.cuv.length - 1) {
+      const nextBook = bibleData.cuv[currentBookIndex + 1];
+      setCurrentBook(nextBook);
+      setCurrentChapter(1);
+    }
+  }, [currentBook, bibleData, currentChapter, chapterCount]);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        goToPreviousChapter();
+      } else if (event.key === "ArrowRight") {
+        goToNextChapter();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [goToPreviousChapter, goToNextChapter]);
+  useEffect(() => {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const handleTouchStart = (event: TouchEvent) => {
+      touchStartX = event.touches[0].clientX;
+    };
+    const handleTouchMove = (event: TouchEvent) => {
+      touchEndX = event.touches[0].clientX;
+    };
+    const handleTouchEnd = () => {
+      if (touchStartX - touchEndX > 50) {
+        goToNextChapter();
+      } else if (touchEndX - touchStartX > 50) {
+        goToPreviousChapter();
+      }
+    };
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [goToPreviousChapter, goToNextChapter]);
 
   const changeBook = (book: BibleBook) => {
     setCurrentBook(book);

@@ -1,14 +1,24 @@
-dynamic loading for better performance and user experience. Here's a suggested approach:
-Store the Bible content in JSON format locally, but split it into smaller files, such as one file per book or even per chapter. This approach allows for faster initial loading and reduces the amount of data sent to the client at once.
+Purpose:
 
-Implement dynamic loading of content as the user navigates through the Bible. Load only the necessary chapters or verses when requested.
-Use Next.js API routes to create a simple API that serves the Bible content from these JSON files. This approach leverages server-side capabilities while maintaining control over your data.
+- Pureply for reading purpose
+- Read in English (ESV) and Chinese (CUV) easily switch between
+- Easy to navigate and good for bible studying.
 
-great now I am doing the react content of the project. Let's design it and you should give me some suggestions which you think is better.
+Bugs:
 
-The end goal is to have a bible web page that is able to run ob my web page. And I need to include both ENglish ESV version, as well as chinese CUV version.
+- Fix the warning messages, but I will just ignore it for now, ensure that fixing it won't break the app.
 
-Using a combination of local JSON files and dynamic loading for better performance and user experience. Here's a suggested approach:
-Store the Bible content in JSON format locally, but split it into smaller files, such as one file per book or even per chapter. This approach allows for faster initial loading and reduces the amount of data sent to the client at once.
-Implement dynamic loading of content as the user navigates through the Bible. Load only the necessary chapters or verses when requested.
-Use Next.js API routes to create a simple API that serves the Bible content from these JSON files. This approach leverages server-side capabilities while maintaining control over your data.
+Todo:
+
+- switch between English and Chinese order.
+- # Add Commentary Link
+- Add Easy open new tab
+- Add navigate to top
+- Add navigate next page previous page at the side
+- Add go to specific verse
+- Add bookmark (reset bookmark button)
+- Add about page
+- # Add copyright
+- 讀經進度 bookmark
+
+Tell me if you have any more features you would wanna like.

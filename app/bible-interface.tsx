@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/sheet";
 import { Globe, Book } from "lucide-react";
 
 interface BibleBook {
@@ -415,6 +420,9 @@ export default function ClientBibleInterface() {
               side="left"
               className="w-[80vw] sm:w-[60vw] max-w-[800px]"
             >
+              <SheetTitle className="sr-only">
+                聖經目錄 / Bible Book List
+              </SheetTitle>
               {getBookList()}
             </SheetContent>
           </Sheet>

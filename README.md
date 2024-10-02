@@ -1,4 +1,10 @@
-Purpose:
+Tell me if you have any more features you would wanna like.
+
+## Live Server:🌟 [https://app.netlify.com/sites/sfnicholas-iphone/](https://bible-cuv-esv.netlify.app/) 🌟
+
+A Bible Reading Website to faciliate reading bible in bilignual, Chinese (CUV) and English (ESV)
+
+Motivation of Project:
 
 - Pureply for reading purpose
 - Read in English (ESV) and Chinese (CUV) easily switch between
@@ -20,5 +26,3 @@ Todo:
 - Add about page
 - # Add copyright
 - 讀經進度 bookmark
-
-Tell me if you have any more features you would wanna like.

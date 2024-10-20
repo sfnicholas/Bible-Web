@@ -151,6 +151,7 @@ export default function ClientBibleInterface() {
       setCurrentChapter(1);
     }
   }, [currentBook, bibleData, currentChapter, chapterCount]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
@@ -164,28 +165,47 @@ export default function ClientBibleInterface() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [goToPreviousChapter, goToNextChapter]);
+
   useEffect(() => {
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
+    let touchEndY = 0;
+    const minSwipeDistance = 50; // Minimum horizontal swipe distance to trigger page change
+    const maxVerticalSwipeDistance = 30; // Max allowed vertical swipe distance to recognize it as horizontal swipe
+
     const handleTouchStart = (event: TouchEvent) => {
       touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
     };
-    const handleTouchMove = (event: TouchEvent) => {
-      touchEndX = event.touches[0].clientX;
-    };
-    const handleTouchEnd = () => {
-      if (touchStartX - touchEndX > 50) {
-        goToNextChapter();
-      } else if (touchEndX - touchStartX > 50) {
-        goToPreviousChapter();
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      touchEndX = event.changedTouches[0].clientX;
+      touchEndY = event.changedTouches[0].clientY;
+
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      // Check if the swipe is primarily horizontal and exceeds the minimum distance
+      if (
+        Math.abs(deltaX) > minSwipeDistance && // Horizontal movement should exceed the minimum distance
+        Math.abs(deltaY) < maxVerticalSwipeDistance // Vertical movement should stay below the threshold
+      ) {
+        if (deltaX > 0) {
+          // Rightward swipe
+          goToPreviousChapter();
+        } else if (deltaX < 0) {
+          // Leftward swipe
+          goToNextChapter();
+        }
       }
     };
+
     window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove);
     window.addEventListener("touchend", handleTouchEnd);
+
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
   }, [goToPreviousChapter, goToNextChapter]);
